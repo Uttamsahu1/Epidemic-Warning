@@ -30,8 +30,9 @@ html, body, .stApp {
     color: #e2e8f0;
 }
 
-#MainMenu, footer, header { visibility: hidden; }
+footer { visibility: hidden; }
 .stDeployButton { display: none; }
+[data-testid="stToolbar"] { display: none; }
 
 [data-testid="stSidebar"] {
     background: #0d1117 !important;
