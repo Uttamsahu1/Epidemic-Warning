@@ -1,28 +1,37 @@
-# 🦠 AI Epidemic Early Warning System
+# 🦠 EpiWatch — AI Epidemic Early Warning System
 
-> Real-time outbreak detection and 30-day case forecasting across 195+ countries
+> An AI-powered web application that detects global outbreak risk and forecasts disease spread using Machine Learning, built with Streamlit.
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue?style=flat-square)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.32+-red?style=flat-square)
-![Scikit-learn](https://img.shields.io/badge/scikit--learn-1.3+-orange?style=flat-square)
-![Track C](https://img.shields.io/badge/CodeCure-Track%20C-green?style=flat-square)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-1.3+-orange?style=flat-square)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
 ---
 
-## 📌 Problem Statement
+## 📌 Overview
 
-Predicting the spread of infectious diseases is essential for public health preparedness. This project (Track C — Epidemic Spread Prediction) builds an AI-powered early warning system that monitors global outbreak risk in real time.
+**EpiWatch** is a machine learning web application that monitors real-time epidemic trends across 195+ countries and predicts disease spread before outbreaks escalate. It classifies countries into three alert levels — 🟢 Low Risk, 🟡 Medium Risk, and 🔴 High Risk — enabling public health authorities to respond early.
+
+Built for the **CodeCure AI Hackathon 2026 — Track C (Epidemic Spread Prediction)**.
 
 ---
 
-## 🚀 Features
+## 🖥️ App Preview
 
-| Feature | Description |
-|---|---|
-| 🌍 **Overview Dashboard** | Global risk distribution, top 10 countries by cases & growth rate |
-| 🔬 **Country Analysis** | Deep-dive trend charts for any country — cases, daily new cases, deaths |
-| 🔮 **30-Day Forecast** | Ridge Regression ML model with lag features & confidence bands |
-| 🚨 **Risk Alerts** | 🔴 High / 🟡 Medium / 🟢 Low alert system based on 7-day growth rate |
+| Overview | Country Analysis | Forecast | Risk Alerts |
+|---|---|---|---|
+| Global KPI dashboard with risk distribution charts | Per-country case trend, daily cases & deaths | 30-day ML forecast with confidence bands | 🔴 High / 🟡 Medium alert tables with country search |
+
+---
+
+## ✨ Features
+
+- **Overview Dashboard** — Total confirmed cases, country-level risk distribution, top 10 countries by case count and growth rate
+- **Country Analysis** — Deep-dive trend charts for any country — cumulative cases, daily new cases, and death trajectory
+- **30-Day Forecast** — Ridge Regression ML model with lag features, rolling averages, and confidence bands
+- **Risk Alert System** — Real-time 🔴 HIGH / 🟡 MEDIUM / 🟢 LOW classification based on 7-day growth rate
+- **Professional Dark UI** — Custom CSS injection for a polished, production-grade Streamlit interface
 
 ---
 
@@ -31,9 +40,9 @@ Predicting the spread of infectious diseases is essential for public health prep
 ```
 epidemic-early-warning/
 │
-├── app.py              ← Streamlit dashboard (main entry)
+├── app.py              ← Main Streamlit web application
 ├── data.py             ← Data loading, cleaning & feature engineering
-├── model.py            ← ML forecasting model + alert logic
+├── model.py            ← Ridge Regression forecaster + alert logic
 ├── requirements.txt    ← Python dependencies
 └── README.md
 ```
@@ -42,47 +51,116 @@ epidemic-early-warning/
 
 ## 📊 Dataset
 
-**Primary:** [Johns Hopkins CSSE COVID-19 Time Series](https://github.com/CSSEGISandData/COVID-19)
-- Daily confirmed cases & deaths across 195+ countries
-- Loaded directly via URL — no manual download needed
+**Primary Dataset:** [Johns Hopkins CSSE COVID-19 Time Series](https://github.com/CSSEGISandData/COVID-19)
+
+Loaded directly via URL — no manual download required.
+
+| Property | Value |
+|---|---|
+| Countries Tracked | 195+ |
+| Date Range | Jan 2020 → Mar 2023 |
+| Data Format | Daily time-series CSV |
+| Source | Johns Hopkins CSSE |
 
 **Features engineered:**
-- Daily new cases (diff of cumulative)
-- 7-day rolling average (smoothed trend)
-- Growth rate (% change over 7 days)
-- Doubling time (days at current growth rate)
-- Risk level: 🔴 HIGH (≥20%) · 🟡 MEDIUM (5–20%) · 🟢 LOW (<5%)
+
+| Feature | Description |
+|---|---|
+| `Daily_Cases` | New cases per day (diff of cumulative) |
+| `Daily_Deaths` | New deaths per day |
+| `Rolling_7day` | 7-day rolling average (smoothed trend) |
+| `Growth_Rate` | % change in rolling average over 7 days |
+| `Doubling_Time` | Days until cases double at current rate |
+| `Risk_Level` | 🔴 HIGH / 🟡 MEDIUM / 🟢 LOW classification |
 
 ---
 
 ## 🤖 ML Model
 
-**Algorithm:** Ridge Regression via scikit-learn Pipeline
+| Property | Value |
+|---|---|
+| Algorithm | Ridge Regression |
+| Framework | scikit-learn Pipeline + StandardScaler |
+| Forecast Horizon | Up to 60 days |
+| Confidence Band | ±30% around prediction |
 
-**Features used:**
-- `Lag1`, `Lag7`, `Lag14` — previous day case counts
-- `Roll7`, `Roll14` — rolling averages
-- `Day` — days since pandemic start
-- `DayOfWeek`, `Month` — temporal features
+**Lag features used for forecasting:**
+
+```python
+Features = ["Day", "Lag1", "Lag7", "Lag14", "Roll7", "Roll14", "DayOfWeek", "Month"]
+```
 
 ---
 
-## ⚙️ Setup & Run
+## 🚨 Risk Level Classification
+
+| Level | Label | Condition | Description |
+|---|---|---|---|
+| 🟢 | **Low Risk** | Growth Rate < 5% | Stable — no significant outbreak signal |
+| 🟡 | **Medium Risk** | Growth Rate 5–20% | Elevated transmission — enhanced surveillance needed |
+| 🔴 | **High Risk** | Growth Rate ≥ 20% | Critical outbreak — immediate intervention required |
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the repository
 
 ```bash
-# 1. Clone repo
 git clone https://github.com/YOUR_USERNAME/epidemic-early-warning.git
 cd epidemic-early-warning
+```
 
-# 2. Install dependencies
+### 2. Install dependencies
+
+```bash
 pip install -r requirements.txt
+```
 
-# 3. Run the dashboard
+### 3. Run the Streamlit app
+
+```bash
 streamlit run app.py
 ```
 
-No dataset download needed — data loads automatically from GitHub.
+Open your browser at `http://localhost:8501`
+
+> ✅ No dataset download needed — data loads automatically from GitHub.
 
 ---
 
-## 🏆 Built for CodeCure AI Hackathon — Track C
+## 📦 Dependencies
+
+```
+streamlit>=1.32.0
+pandas>=2.0.0
+numpy>=1.24.0
+matplotlib>=3.7.0
+scikit-learn>=1.3.0
+requests>=2.31.0
+```
+
+---
+
+## 🏗️ Built With
+
+- **[Streamlit](https://streamlit.io)** — Web app framework
+- **[scikit-learn](https://scikit-learn.org)** — Ridge Regression ML model
+- **[Pandas](https://pandas.pydata.org)** — Data processing & feature engineering
+- **[NumPy](https://numpy.org)** — Numerical computing
+- **[Matplotlib](https://matplotlib.org)** — Charts and visualizations
+- **[Johns Hopkins CSSE](https://github.com/CSSEGISandData/COVID-19)** — COVID-19 dataset
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+## 🙋‍♂️ Author
+
+Built with ❤️ for **CodeCure AI Hackathon 2026 — Track C**
+
+> *"An outbreak detected a week early can save thousands of lives. EpiWatch monitors every country, every day — so no signal goes unnoticed."*
