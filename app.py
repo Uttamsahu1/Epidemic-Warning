@@ -34,6 +34,11 @@ footer { visibility: hidden; }
 .stDeployButton { display: none; }
 [data-testid="stToolbar"] { display: none; }
 
+/* Hide sidebar collapse arrow button */
+[data-testid="stSidebarCollapseButton"] { display: none !important; }
+[data-testid="collapsedControl"] { display: none !important; }
+section[data-testid="stSidebar"] > div:first-child { padding-top: 0 !important; }
+
 [data-testid="stSidebar"] {
     background: #0d1117 !important;
     border-right: 1px solid #1e2535;
