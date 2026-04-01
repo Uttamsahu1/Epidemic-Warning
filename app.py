@@ -17,75 +17,45 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ── Global CSS ────────────────────────────────────────────────────────────────
+# ── Global CSS  ─────────
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
 html, body, .stApp {
     background: #080b12 !important;
     font-family: 'DM Sans', sans-serif;
     color: #e2e8f0;
 }
+
+
 #MainMenu, footer { visibility: hidden; }
 .stDeployButton { display: none; }
 
-/* ── Sidebar ── */
 [data-testid="stSidebar"] {
     background: #0d1117 !important;
-    border-right: 1px solid #1e2535 !important;
-}
-[data-testid="stSidebar"] > div:first-child {
-    padding-top: 0 !important;
+    border-right: 1px solid #1e2535;
 }
 
-/* Radio nav items */
-[data-testid="stSidebar"] .stRadio > label {
-    display: none !important;
+/* Sidebar radio buttons */
+[data-testid="stSidebar"] .stRadio {
+    display: block !important;
+    visibility: visible !important;
 }
-[data-testid="stSidebar"] .stRadio > div {
-    gap: 2px !important;
+[data-testid="stSidebar"] .stRadio label {
+    color: #94a3b8 !important;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    padding: 6px 0;
+    transition: color 0.2s;
+    cursor: pointer;
 }
-[data-testid="stSidebar"] .stRadio [data-testid="stMarkdownContainer"] {
-    display: none !important;
-}
-[data-testid="stSidebar"] .stRadio label[data-baseweb="radio"] {
-    background: transparent !important;
-    border-radius: 10px !important;
-    padding: 10px 14px !important;
-    margin: 1px 8px !important;
-    display: flex !important;
-    align-items: center !important;
-    cursor: pointer !important;
-    transition: background 0.15s, color 0.15s !important;
-    width: calc(100% - 16px) !important;
-}
-[data-testid="stSidebar"] .stRadio label[data-baseweb="radio"]:hover {
-    background: #161d2b !important;
-}
-[data-testid="stSidebar"] .stRadio label[data-baseweb="radio"] > div:first-child {
-    display: none !important;
-}
-[data-testid="stSidebar"] .stRadio label[data-baseweb="radio"] > div:last-child {
-    color: #64748b !important;
-    font-family: 'DM Sans', sans-serif !important;
-    font-size: 0.9rem !important;
-    font-weight: 500 !important;
-    margin-left: 0 !important;
-}
-[data-testid="stSidebar"] .stRadio label[aria-checked="true"] {
-    background: #0f1f2e !important;
-}
-[data-testid="stSidebar"] .stRadio label[aria-checked="true"] > div:last-child {
-    color: #f1f5f9 !important;
-    font-weight: 600 !important;
-}
+[data-testid="stSidebar"] .stRadio label:hover { color: #e2e8f0 !important; }
 
-/* ── Main content ── */
 .block-container { padding: 2rem 2.5rem 3rem 2.5rem !important; max-width: 1400px; }
 
-/* ── Hero ── */
 .hero {
     background: linear-gradient(135deg, #0f1923 0%, #111827 50%, #0a0f1a 100%);
     border: 1px solid #1e2d45;
@@ -128,7 +98,6 @@ html, body, .stApp {
     letter-spacing: 0.2px;
 }
 
-/* ── Metric cards ── */
 .metric-card {
     background: #0d1117;
     border: 1px solid #1e2535;
@@ -168,7 +137,6 @@ html, body, .stApp {
 }
 .metric-sub { font-size: 0.8rem; color: #475569; margin-top: 0.3rem; }
 
-/* ── Section header ── */
 .section-header {
     font-family: 'Syne', sans-serif;
     font-size: 1.25rem;
@@ -187,7 +155,6 @@ html, body, .stApp {
     margin-left: 0.5rem;
 }
 
-/* ── Alert box ── */
 .alert-box {
     border-radius: 16px;
     padding: 1.8rem 2rem;
@@ -202,7 +169,13 @@ html, body, .stApp {
 }
 .alert-desc { color: #94a3b8; font-size: 0.95rem; }
 
-/* ── Tabs ── */
+.prob-row { margin: 0.4rem 0; }
+.prob-label { font-size: 0.85rem; color: #94a3b8; margin-bottom: 0.2rem; display:flex; justify-content:space-between; }
+.prob-bar-bg { background: #1e2535; border-radius: 999px; height: 8px; }
+.prob-bar-fill { height: 8px; border-radius: 999px; }
+
+hr { border-color: #1e2535 !important; }
+
 .stTabs [data-baseweb="tab-list"] {
     background: #0d1117 !important;
     border-bottom: 1px solid #1e2535 !important;
@@ -221,8 +194,6 @@ html, body, .stApp {
     background: transparent !important;
 }
 
-/* ── Misc ── */
-hr { border-color: #1e2535 !important; }
 [data-testid="stMetric"] {
     background: #0d1117;
     border: 1px solid #1e2535;
@@ -253,19 +224,15 @@ plt.rcParams.update({
 
 RISK_COLORS = {"LOW": "#10b981", "MEDIUM": "#f59e0b", "HIGH": "#ef4444"}
 
-# ── Data ──────────────────────────────────────────────────────────────────────
+# ── Data loading ──────────────────────────────────────────────────────────────
 @st.cache_data(show_spinner=False)
 def cached_load():
     return load_data()
 
 with st.spinner("⏳ Loading global epidemic data..."):
-    df        = cached_load()
-    snap      = get_latest_snapshot(df)
+    df      = cached_load()
+    snap    = get_latest_snapshot(df)
     countries = get_country_list(df)
-
-total_countries = snap["Country/Region"].nunique()
-high_risk       = (snap["Risk_Level"] == "HIGH").sum()
-total_cases     = int(snap["Confirmed"].sum())
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
@@ -274,38 +241,33 @@ with st.sidebar:
         <div style='font-family:Syne,sans-serif;font-size:1.4rem;font-weight:800;color:#f1f5f9'>
             🦠 EpiWatch
         </div>
-        <div style='font-size:0.72rem;color:#334155;margin-top:0.2rem;letter-spacing:1px;text-transform:uppercase;'>
-            AI Early Warning System
+        <div style='font-size:0.78rem;color:#334155;margin-top:0.2rem;letter-spacing:0.5px'>
+            AI EPIDEMIC EARLY WARNING SYSTEM
         </div>
     </div>
     """, unsafe_allow_html=True)
     st.divider()
-
-    page = st.radio(
-        "Navigation",
-        ["🌍  Overview", "🔬  Country Analysis", "🔮  Forecast", "🚨  Risk Alerts"],
-        label_visibility="collapsed"
-    )
-
+    page = st.radio("", ["Overview", "Country Analysis", "Forecast", "Risk Alerts"], label_visibility="collapsed")
     st.divider()
+
+    total_countries = snap["Country/Region"].nunique()
+    high_risk = (snap["Risk_Level"] == "HIGH").sum()
+    total_cases = int(snap["Confirmed"].sum())
+
     st.markdown(f"""
-    <div style='padding:1rem;background:#080b12;border:1px solid #1e2535;border-radius:10px;margin-top:0.5rem'>
-        <div style='font-size:0.65rem;color:#334155;text-transform:uppercase;letter-spacing:1px;margin-bottom:0.8rem'>
-            LIVE STATS
-        </div>
-        <div style='display:flex;justify-content:space-between;margin-bottom:0.5rem'>
+    <div style='padding:1rem;background:#0d1117;border:1px solid #1e2535;border-radius:10px;margin-top:0.5rem'>
+        <div style='font-size:0.7rem;color:#334155;text-transform:uppercase;letter-spacing:1px;margin-bottom:0.8rem'>LIVE STATS</div>
+        <div style='display:flex;justify-content:space-between;margin-bottom:0.4rem'>
             <span style='color:#475569;font-size:0.82rem'>Countries Tracked</span>
-            <span style='color:#e2e8f0;font-weight:700;font-size:0.82rem'>{total_countries}</span>
+            <span style='color:#e2e8f0;font-weight:600;font-size:0.82rem'>{total_countries}</span>
         </div>
-        <div style='height:1px;background:#1e2535;margin-bottom:0.5rem'></div>
-        <div style='display:flex;justify-content:space-between;margin-bottom:0.5rem'>
+        <div style='display:flex;justify-content:space-between;margin-bottom:0.4rem'>
             <span style='color:#475569;font-size:0.82rem'>High Risk Nations</span>
-            <span style='color:#ef4444;font-weight:700;font-size:0.82rem'>{high_risk}</span>
+            <span style='color:#ef4444;font-weight:600;font-size:0.82rem'>{high_risk}</span>
         </div>
-        <div style='height:1px;background:#1e2535;margin-bottom:0.5rem'></div>
         <div style='display:flex;justify-content:space-between'>
             <span style='color:#475569;font-size:0.82rem'>Total Cases</span>
-            <span style='color:#e2e8f0;font-weight:700;font-size:0.82rem'>{total_cases/1e6:.1f}M</span>
+            <span style='color:#e2e8f0;font-weight:600;font-size:0.82rem'>{total_cases/1e6:.1f}M</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -314,7 +276,7 @@ with st.sidebar:
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE 1 — OVERVIEW
 # ══════════════════════════════════════════════════════════════════════════════
-if page == "🌍  Overview":
+if page == "Overview":
 
     st.markdown("""
     <div class='hero'>
@@ -323,9 +285,11 @@ if page == "🌍  Overview":
     </div>
     """, unsafe_allow_html=True)
 
-    low_n  = (snap["Risk_Level"] == "LOW").sum()
-    mid_n  = (snap["Risk_Level"] == "MEDIUM").sum()
-    high_n = (snap["Risk_Level"] == "HIGH").sum()
+    # KPI cards
+    low_n    = (snap["Risk_Level"] == "LOW").sum()
+    mid_n    = (snap["Risk_Level"] == "MEDIUM").sum()
+    high_n   = (snap["Risk_Level"] == "HIGH").sum()
+    total_deaths = int(snap["Deaths"].sum())
 
     c1, c2, c3, c4 = st.columns(4)
     with c1:
@@ -350,6 +314,7 @@ if page == "🌍  Overview":
             <div class='metric-sub'>Critical alert</div></div>""", unsafe_allow_html=True)
 
     st.markdown("<div style='margin-top:1.5rem'></div>", unsafe_allow_html=True)
+
     col1, col2 = st.columns([1.1, 1])
 
     with col1:
@@ -369,10 +334,11 @@ if page == "🌍  Overview":
     with col2:
         st.markdown("<div class='section-header'>Risk Breakdown</div>", unsafe_allow_html=True)
         fig, ax = plt.subplots(figsize=(5, 3.8), subplot_kw=dict(aspect="equal"))
+        wedge_colors = ["#059669", "#d97706", "#dc2626"]
         wedges, texts, autotexts = ax.pie(
             counts, labels=labels,
-            colors=["#059669","#d97706","#dc2626"],
-            autopct="%1.1f%%", startangle=140, pctdistance=0.75,
+            colors=wedge_colors, autopct="%1.1f%%",
+            startangle=140, pctdistance=0.75,
             wedgeprops=dict(width=0.55, edgecolor="#0d1117", linewidth=2)
         )
         for t in texts:     t.set_color("#64748b"); t.set_fontsize(9)
@@ -380,26 +346,27 @@ if page == "🌍  Overview":
         fig.tight_layout(); st.pyplot(fig, use_container_width=True); plt.close()
 
     st.markdown("<div class='section-header'>Top 10 Countries by Total Cases</div>", unsafe_allow_html=True)
-    top10 = snap.nlargest(10, "Confirmed")
+    top10 = snap.nlargest(10, "Confirmed")[["Country/Region","Confirmed","Daily_Cases","Growth_Rate","Risk_Level"]]
     col3, col4 = st.columns(2)
 
     with col3:
         fig, ax = plt.subplots(figsize=(7, 4))
-        top10s = top10.sort_values("Confirmed")
-        ax.barh(top10s["Country/Region"], top10s["Confirmed"]/1e6,
-                color=[RISK_COLORS[r] for r in top10s["Risk_Level"]], height=0.6, zorder=3)
+        top10_sorted = top10.sort_values("Confirmed")
+        risk_bar_colors = [RISK_COLORS[r] for r in top10_sorted["Risk_Level"]]
+        ax.barh(top10_sorted["Country/Region"], top10_sorted["Confirmed"]/1e6,
+                color=risk_bar_colors, height=0.6, zorder=3)
         ax.set_xlabel("Confirmed Cases (Millions)")
         ax.xaxis.grid(True, zorder=0); ax.set_axisbelow(True)
-        patches = [mpatches.Patch(color=c, label=l)
-                   for c, l in zip(["#10b981","#f59e0b","#ef4444"], ["Low","Medium","High"])]
+        patches = [mpatches.Patch(color=c, label=l) for c, l in zip(["#10b981","#f59e0b","#ef4444"],["Low","Medium","High"])]
         ax.legend(handles=patches, loc="lower right", fontsize=8, framealpha=0.1)
         fig.tight_layout(); st.pyplot(fig, use_container_width=True); plt.close()
 
     with col4:
         fig, ax = plt.subplots(figsize=(7, 4))
-        top10g = top10.sort_values("Growth_Rate")
-        ax.barh(top10g["Country/Region"], top10g["Growth_Rate"],
-                color=[RISK_COLORS[r] for r in top10g["Risk_Level"]], height=0.6, zorder=3)
+        top10_gr = top10.sort_values("Growth_Rate")
+        gr_colors = [RISK_COLORS[r] for r in top10_gr["Risk_Level"]]
+        ax.barh(top10_gr["Country/Region"], top10_gr["Growth_Rate"],
+                color=gr_colors, height=0.6, zorder=3)
         ax.set_xlabel("7-Day Growth Rate (%)")
         ax.xaxis.grid(True, zorder=0); ax.set_axisbelow(True)
         fig.tight_layout(); st.pyplot(fig, use_container_width=True); plt.close()
@@ -408,7 +375,7 @@ if page == "🌍  Overview":
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE 2 — COUNTRY ANALYSIS
 # ══════════════════════════════════════════════════════════════════════════════
-elif page == "🔬  Country Analysis":
+elif page == "Country Analysis":
 
     st.markdown("""
     <div style='font-family:Syne,sans-serif;font-size:2rem;font-weight:800;color:#f1f5f9;margin-bottom:0.3rem'>
@@ -421,9 +388,10 @@ elif page == "🔬  Country Analysis":
 
     default_idx = countries.index("US") if "US" in countries else 0
     country = st.selectbox("Select Country", countries, index=default_idx)
-    cdf     = get_country_data(df, country)
-    latest  = cdf.iloc[-1]
-    alert   = get_alert_level(latest["Growth_Rate"], latest.get("Doubling_Time", np.nan))
+    cdf = get_country_data(df, country)
+    latest = cdf.iloc[-1]
+
+    alert = get_alert_level(latest["Growth_Rate"], latest.get("Doubling_Time", np.nan))
 
     c1, c2, c3, c4 = st.columns(4)
     with c1:
@@ -449,6 +417,7 @@ elif page == "🔬  Country Analysis":
             <div class='metric-value'>{dt_str}</div>
             <div class='metric-sub'>At current rate</div></div>""", unsafe_allow_html=True)
 
+    # Alert box
     st.markdown(f"""
     <div class='alert-box' style='background:{alert["bg"]};border-color:{alert["border"]}'>
         <div class='alert-label' style='color:{alert["color"]}'>{alert["emoji"]} {alert["level"]} RISK</div>
@@ -462,7 +431,7 @@ elif page == "🔬  Country Analysis":
         fig, ax = plt.subplots(figsize=(12, 4))
         ax.plot(cdf["Date"], cdf["Confirmed"]/1e6, color="#3b82f6", lw=2)
         ax.fill_between(cdf["Date"], cdf["Confirmed"]/1e6, alpha=0.15, color="#3b82f6")
-        ax.set_ylabel("Confirmed Cases (Millions)")
+        ax.set_ylabel("Confirmed Cases (Millions)"); ax.set_xlabel("")
         ax.yaxis.grid(True); ax.set_axisbelow(True)
         fig.tight_layout(); st.pyplot(fig, use_container_width=True); plt.close()
 
@@ -470,7 +439,7 @@ elif page == "🔬  Country Analysis":
         fig, ax = plt.subplots(figsize=(12, 4))
         ax.bar(cdf["Date"], cdf["Daily_Cases"], color="#1e3a5f", width=1, zorder=2, label="Daily Cases")
         ax.plot(cdf["Date"], cdf["Rolling_7day"], color="#f59e0b", lw=2, label="7-Day Avg")
-        ax.set_ylabel("Daily New Cases")
+        ax.set_ylabel("Daily New Cases"); ax.set_xlabel("")
         ax.yaxis.grid(True); ax.set_axisbelow(True)
         ax.legend(framealpha=0.1, fontsize=9)
         fig.tight_layout(); st.pyplot(fig, use_container_width=True); plt.close()
@@ -479,7 +448,7 @@ elif page == "🔬  Country Analysis":
         fig, ax = plt.subplots(figsize=(12, 4))
         ax.plot(cdf["Date"], cdf["Deaths"]/1e3, color="#ef4444", lw=2)
         ax.fill_between(cdf["Date"], cdf["Deaths"]/1e3, alpha=0.15, color="#ef4444")
-        ax.set_ylabel("Deaths (Thousands)")
+        ax.set_ylabel("Deaths (Thousands)"); ax.set_xlabel("")
         ax.yaxis.grid(True); ax.set_axisbelow(True)
         fig.tight_layout(); st.pyplot(fig, use_container_width=True); plt.close()
 
@@ -487,7 +456,7 @@ elif page == "🔬  Country Analysis":
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE 3 — FORECAST
 # ══════════════════════════════════════════════════════════════════════════════
-elif page == "🔮  Forecast":
+elif page == "Forecast":
 
     st.markdown("""
     <div style='font-family:Syne,sans-serif;font-size:2rem;font-weight:800;color:#f1f5f9;margin-bottom:0.3rem'>
@@ -502,30 +471,29 @@ elif page == "🔮  Forecast":
 
     with col_left:
         st.markdown("<div class='section-header'>Settings</div>", unsafe_allow_html=True)
-        default_idx  = countries.index("US") if "US" in countries else 0
+        default_idx = countries.index("US") if "US" in countries else 0
         sel_country  = st.selectbox("Country", countries, index=default_idx)
         forecast_days = st.slider("Forecast Horizon (days)", 7, 60, 30)
         run_btn = st.button("🔮  Generate Forecast", use_container_width=True)
 
-        cdf    = get_country_data(df, sel_country)
+        cdf = get_country_data(df, sel_country)
         latest = cdf.iloc[-1]
         alert  = get_alert_level(latest["Growth_Rate"], latest.get("Doubling_Time", np.nan))
 
-        card_color = "red" if alert["level"] == "HIGH" else "amber" if alert["level"] == "MEDIUM" else "green"
         st.markdown(f"""
         <div style='margin-top:1.5rem'>
-            <div class='metric-card {card_color}'>
+            <div class='metric-card {"red" if alert["level"]=="HIGH" else "amber" if alert["level"]=="MEDIUM" else "green"}'>
                 <div class='metric-label'>Current Risk</div>
                 <div class='metric-value' style='font-size:1.4rem'>{alert["emoji"]} {alert["level"]}</div>
                 <div class='metric-sub'>{latest["Growth_Rate"]:.1f}% growth rate</div>
             </div>
         </div>""", unsafe_allow_html=True)
 
-        for label, raw_val, color, max_val in [
-            ("Growth Rate",    abs(latest["Growth_Rate"]),  "#ef4444" if latest["Growth_Rate"] > 20 else "#f59e0b" if latest["Growth_Rate"] > 5 else "#10b981", 100),
-            ("7-Day Avg Cases", latest["Rolling_7day"],     "#3b82f6", max(latest["Rolling_7day"] * 1.2, 1)),
+        for label, val, color, max_val in [
+            ("Growth Rate", min(abs(latest["Growth_Rate"]), 100), "#ef4444" if latest["Growth_Rate"]>20 else "#f59e0b" if latest["Growth_Rate"]>5 else "#10b981", 100),
+            ("7-Day Avg Cases", min(latest["Rolling_7day"], 100000), "#3b82f6", 100000),
         ]:
-            pct     = int(min(raw_val / max_val * 100, 100))
+            pct = int(val / max_val * 100)
             display = f"{latest['Growth_Rate']:.1f}%" if "Growth" in label else f"{int(latest['Rolling_7day']):,}"
             st.markdown(f"""
             <div style='margin-bottom:1rem;margin-top:0.5rem'>
@@ -539,24 +507,36 @@ elif page == "🔮  Forecast":
             </div>""", unsafe_allow_html=True)
 
     with col_right:
-        st.markdown("<div class='section-header'>Case Forecast Chart</div>", unsafe_allow_html=True)
-        if run_btn:
+        st.markdown("<div class='section-header'>30-Day Case Forecast</div>", unsafe_allow_html=True)
+
+        if run_btn or True:
             with st.spinner("Running ML forecast..."):
                 fc = forecast(cdf, days=forecast_days)
+
             if fc is not None:
                 recent = cdf[cdf["Date"] >= cdf["Date"].max() - pd.Timedelta(days=60)]
+
                 fig, ax = plt.subplots(figsize=(10, 5))
-                ax.plot(recent["Date"], recent["Daily_Cases"], color="#475569", lw=1.5, label="Historical", alpha=0.7)
-                ax.plot(recent["Date"], recent["Rolling_7day"], color="#3b82f6", lw=2.5, label="7-Day Avg")
-                ax.plot(fc["Date"], fc["Forecast"], color="#10b981", lw=2.5, linestyle="--", label=f"{forecast_days}-Day Forecast")
-                ax.fill_between(fc["Date"], fc["Forecast"]*0.7, fc["Forecast"]*1.3, alpha=0.12, color="#10b981", label="±30% Band")
+                ax.plot(recent["Date"], recent["Daily_Cases"],
+                        color="#475569", lw=1.5, label="Historical Daily Cases", alpha=0.7)
+                ax.plot(recent["Date"], recent["Rolling_7day"],
+                        color="#3b82f6", lw=2.5, label="7-Day Rolling Avg")
+                ax.plot(fc["Date"], fc["Forecast"],
+                        color="#10b981", lw=2.5, linestyle="--", label=f"{forecast_days}-Day Forecast")
+                ax.fill_between(fc["Date"],
+                                fc["Forecast"] * 0.7,
+                                fc["Forecast"] * 1.3,
+                                alpha=0.12, color="#10b981", label="Confidence Band (±30%)")
                 ax.axvline(x=cdf["Date"].max(), color="#334155", linestyle=":", lw=1.5)
-                ax.set_ylabel("Daily Cases"); ax.legend(framealpha=0.1, fontsize=9)
+                ax.text(cdf["Date"].max(), ax.get_ylim()[1]*0.95,
+                        " Forecast start", color="#64748b", fontsize=8)
+                ax.set_ylabel("Daily Cases"); ax.set_xlabel("")
+                ax.legend(framealpha=0.1, fontsize=9, loc="upper left")
                 ax.yaxis.grid(True); ax.set_axisbelow(True)
                 fig.tight_layout(); st.pyplot(fig, use_container_width=True); plt.close()
 
-                peak_forecast  = fc["Forecast"].max()
-                peak_date      = fc.loc[fc["Forecast"].idxmax(), "Date"].strftime("%b %d, %Y")
+                peak_forecast = fc["Forecast"].max()
+                peak_date     = fc.loc[fc["Forecast"].idxmax(), "Date"].strftime("%b %d, %Y")
                 total_forecast = int(fc["Forecast"].sum())
 
                 f1, f2, f3 = st.columns(3)
@@ -577,22 +557,12 @@ elif page == "🔮  Forecast":
                         <div class='metric-sub'>over {forecast_days} days</div></div>""", unsafe_allow_html=True)
             else:
                 st.warning("Not enough data to forecast for this country.")
-        else:
-            st.markdown("""
-            <div style='text-align:center;padding:5rem 2rem;background:#0d1117;
-                        border:1px dashed #1e2535;border-radius:14px;'>
-                <div style='font-size:3rem;margin-bottom:1rem'>🔮</div>
-                <div style='color:#334155;font-size:0.95rem'>
-                    Select a country and click<br>
-                    <b style='color:#475569'>Generate Forecast</b>
-                </div>
-            </div>""", unsafe_allow_html=True)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE 4 — RISK ALERTS
 # ══════════════════════════════════════════════════════════════════════════════
-elif page == "🚨  Risk Alerts":
+elif page == "Risk Alerts":
 
     st.markdown("""
     <div style='font-family:Syne,sans-serif;font-size:2rem;font-weight:800;color:#f1f5f9;margin-bottom:0.3rem'>
@@ -605,15 +575,15 @@ elif page == "🚨  Risk Alerts":
 
     tab_high, tab_med, tab_all = st.tabs(["  🔴 High Risk  ", "  🟡 Medium Risk  ", "  📊 All Countries  "])
 
-    def risk_table(risk_df):
+    def risk_table(risk_df, color):
         cols = ["Country/Region","Confirmed","Daily_Cases","Rolling_7day","Growth_Rate","Doubling_Time","Deaths"]
         display = risk_df[cols].copy()
-        display["Confirmed"]    = display["Confirmed"].apply(lambda x: f"{x/1e6:.2f}M")
-        display["Daily_Cases"]  = display["Daily_Cases"].apply(lambda x: f"{int(x):,}")
-        display["Rolling_7day"] = display["Rolling_7day"].apply(lambda x: f"{int(x):,}")
-        display["Growth_Rate"]  = display["Growth_Rate"].apply(lambda x: f"{x:.1f}%")
-        display["Doubling_Time"]= display["Doubling_Time"].apply(lambda x: f"{x:.0f}d" if pd.notna(x) and x > 0 else "Stable")
-        display["Deaths"]       = display["Deaths"].apply(lambda x: f"{x/1e3:.1f}K")
+        display["Confirmed"]   = display["Confirmed"].apply(lambda x: f"{x/1e6:.2f}M")
+        display["Daily_Cases"] = display["Daily_Cases"].apply(lambda x: f"{int(x):,}")
+        display["Rolling_7day"]= display["Rolling_7day"].apply(lambda x: f"{int(x):,}")
+        display["Growth_Rate"] = display["Growth_Rate"].apply(lambda x: f"{x:.1f}%")
+        display["Doubling_Time"]= display["Doubling_Time"].apply(lambda x: f"{x:.0f}d" if pd.notna(x) and x>0 else "Stable")
+        display["Deaths"]      = display["Deaths"].apply(lambda x: f"{x/1e3:.1f}K")
         display.columns = ["Country","Total Cases","Daily Cases","7-Day Avg","Growth Rate","Doubling Time","Deaths"]
         st.dataframe(display.reset_index(drop=True), use_container_width=True, height=400)
 
@@ -621,7 +591,7 @@ elif page == "🚨  Risk Alerts":
         high_df = snap[snap["Risk_Level"] == "HIGH"].sort_values("Growth_Rate", ascending=False)
         st.markdown(f"<div style='color:#ef4444;font-family:Syne,sans-serif;font-weight:700;font-size:1.1rem;margin-bottom:1rem'>⚠️ {len(high_df)} countries at HIGH risk</div>", unsafe_allow_html=True)
         if len(high_df):
-            risk_table(high_df)
+            risk_table(high_df, "#ef4444")
             fig, ax = plt.subplots(figsize=(10, 4))
             top_high = high_df.head(15).sort_values("Growth_Rate")
             ax.barh(top_high["Country/Region"], top_high["Growth_Rate"], color="#ef4444", height=0.6, zorder=3)
@@ -634,7 +604,7 @@ elif page == "🚨  Risk Alerts":
         med_df = snap[snap["Risk_Level"] == "MEDIUM"].sort_values("Growth_Rate", ascending=False)
         st.markdown(f"<div style='color:#f59e0b;font-family:Syne,sans-serif;font-weight:700;font-size:1.1rem;margin-bottom:1rem'>⚡ {len(med_df)} countries at MEDIUM risk</div>", unsafe_allow_html=True)
         if len(med_df):
-            risk_table(med_df)
+            risk_table(med_df, "#f59e0b")
         else:
             st.success("No countries currently at MEDIUM risk.")
 
@@ -642,4 +612,5 @@ elif page == "🚨  Risk Alerts":
         st.markdown("<div class='section-header'>All Countries — Risk Snapshot</div>", unsafe_allow_html=True)
         search = st.text_input("🔍 Search country", placeholder="Type country name...")
         filtered = snap[snap["Country/Region"].str.contains(search, case=False)] if search else snap
-        risk_table(filtered.sort_values("Growth_Rate", ascending=False))
+        filtered = filtered.sort_values("Growth_Rate", ascending=False)
+        risk_table(filtered, "#94a3b8")
